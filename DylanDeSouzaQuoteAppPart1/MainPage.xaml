@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:DylanDeSouzaQuoteAppPart1"
-             x:Class="DylanDeSouzaQuoteAppPart1.MainPage">
+             x:Class="DylanDeSouzaQuoteAppPart1.MainPage"
+             x:DataType="local:Model">
 
     <VerticalStackLayout Padding="20" Spacing="15">
         <Label Text="Inspirational Quotes" 
@@ -22,5 +23,5 @@
 
         <Button Text="Get Random Quote" Clicked="Button_Clicked" Margin="10" />
     </VerticalStackLayout>
-    
+
 </ContentPage>
