@@ -11,8 +11,7 @@ namespace DylanDeSouzaQuoteAppPart1
     public partial class Model : INotifyPropertyChanged
     {
         const string fileName = "QuotesAndAuthorsFile.txt";
-        string localFolder = FileSystem.AppDataDirectory;
-        string filePath;
+        string filePath = Path.Combine(FileSystem.AppDataDirectory, fileName);
         string contents;
         Quote currentQuote;
         string randomQuote;
@@ -25,7 +24,7 @@ namespace DylanDeSouzaQuoteAppPart1
         protected void NotifyPropertyChanged([CallerMemberName] string? propertyName = null) =>
            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        void InitializeDefaultData()
+        void InitializeAndSaveDefaultData()
         {
             QuotesAuthors =
             [
@@ -33,11 +32,11 @@ namespace DylanDeSouzaQuoteAppPart1
                 new("Everyone is a genius. But if you judge a fish by its ability to climb a tree, it will live its whole life believing that it is stupid.", "Albert Einstein"),
                 new("A life spent making mistakes is not only more honorable, but more useful than a life spent doing nothing.", "George Bernard Shaw")
             ];
+            Save();
         }
 
         public Model() 
         {
-            filePath = Path.Combine(localFolder, fileName);
             EnsureFileExists();
             LoadFileContents();
             CurrentQuote = new Quote("", "");
@@ -47,16 +46,9 @@ namespace DylanDeSouzaQuoteAppPart1
         {
             if (!File.Exists(filePath))
             {
-                File.Create(filePath);
-                InitializeDefaultData();
-                SaveQuotes();
+                File.Create(filePath).Dispose();
+                InitializeAndSaveDefaultData();
             }
-        }
-
-        void SaveQuotes()
-        {
-            string jsonData = JsonConvert.SerializeObject(QuotesAuthors);
-            File.WriteAllText(filePath, jsonData);
         }
 
         void LoadFileContents()
@@ -66,11 +58,16 @@ namespace DylanDeSouzaQuoteAppPart1
                 contents = File.ReadAllText(filePath);
                 if (string.IsNullOrWhiteSpace(contents))
                 {
-                    InitializeDefaultData();
-                    SaveQuotes();
+                    InitializeAndSaveDefaultData();
                 }
                 else QuotesAuthors = JsonConvert.DeserializeObject<List<Quote>>(contents);
             }
+        }
+
+        void Save()
+        {
+            string jsonData = JsonConvert.SerializeObject(QuotesAuthors);
+            File.WriteAllText(filePath, jsonData);
         }
 
         public Quote CurrentQuote
@@ -112,7 +109,7 @@ namespace DylanDeSouzaQuoteAppPart1
             if (!string.IsNullOrWhiteSpace(CurrentQuote.Message) && !string.IsNullOrWhiteSpace(CurrentQuote.Message))
             {
                 QuotesAuthors.Add(new Quote(CurrentQuote.Message, CurrentQuote.Author));
-                SaveQuotes();
+                Save();
                 CurrentQuote.Message = "";
                 CurrentQuote.Author = "";
             }
